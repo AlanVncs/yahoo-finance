@@ -1,0 +1,27 @@
+{
+  "name": "yahoo-finance-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlanVncs/yahoo-finance-api.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlanVncs/yahoo-finance-api/issues"
+  },
+  "homepage": "https://github.com/AlanVncs/yahoo-finance-api#readme",
+  "dependencies": {
+    "csv-parser": "^2.3.2",
+    "puppeteer": "^2.0.0",
+    "string-to-stream": "^3.0.1"
+  }
+}

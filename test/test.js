@@ -2,36 +2,46 @@ const puppeteer = require('puppeteer');
 const strToStream = require('string-to-stream')
 const csv = require('csv-parser');
 
+const table = [];
+var cnt = 0;
 
-var table = [];
-
+// 'ALPA4', 'AMAR3', 'ARZZ3', 'BBAS3', 'BBDC3', 'BBDC4'
 (async () => {
-    await buildTable("ITUB4");    
-    await console.log(table);
+    buildTable("ALPA4");
+    buildTable("AMAR3");
+    buildTable("ARZZ3");
+    buildTable("BBAS3");
+    buildTable("BBDC3");
+    buildTable("BOVA11");
+    setInterval(function(){
+        if(cnt >= 6){
+            console.log(table);
+            clearInterval(this);
+        }
+    }, 1000);
 })();
 
 
 
 async function buildTable(symbol){
-    const data = await scrapData(symbol);
-    const hist = [];
- 
-    strToStream(data.histPrice)
-    .pipe(csv())
-    .on('data', (element) => hist.push(element))
-    .on('end', () => {
-        hist.forEach(element => {
-            const key = element["Date"];
-            // console.log(table[key]);
-            if(!table[key]){
-                table[key] = [];
-            }
-            // console.log(table[key]);
-            table[key][symbol] = [];
-            table[key][symbol]["adj"] = element["Adj Close"];
-            // console.log(table[key][symbol]["adj"]);
+    return new Promise(async (resolve, reject) => {
+        const data = await scrapData(symbol);
+        const hist = [];
+    
+        strToStream(data.histPrice).pipe(csv())
+        .on('data', (element) => hist.push(element))
+        .on('end', function() {
+            hist.forEach(element => {
+                const key = element["Date"];
+                if(!table[key]){
+                    table[key] = [];
+                }
+                table[key][symbol] = [];
+                table[key][symbol]["adj"] = element["Adj Close"];
+            });
+            cnt++;
+            resolve();
         });
-        console.log(table);
     });
 }
 
@@ -41,14 +51,24 @@ async function scrapData(symbol){
     const page = await browser.newPage();
     // page.on('console', msg => console.log(`chrome[${msg.text()}]`));
     await page.goto(url, {waitUntil: 'load'});
-    const data = await page.evaluate(async (symbol) => {
-        var currentPrice = document.querySelector("#quote-header-info > div + div + div > div > div > span").innerText;
-        var fileLink = document.querySelector(`a[download='${symbol}.SA.csv']`).href;
-        const histPrice = await (await fetch(fileLink, {credentials: 'include'})).text();
-        return {histPrice, currentPrice};
-    }, symbol);
-    await browser.close();
-    return data;
+    try{
+        const data = await page.evaluate(async (symbol) => {
+            var currentPrice = document.querySelector("#quote-header-info > div + div + div > div > div > span").innerText;
+            var fileLink = document.querySelector(`a[download='${symbol}.SA.csv']`).href;
+            const histPrice = await (await fetch(fileLink, {credentials: 'include'})).text();
+            return {histPrice, currentPrice};
+        }, symbol);
+        return data;
+    }
+    catch(err){
+        console.log(`Erro na consulta do ativo ${symbol}: ${err.message}`);
+        console.log(`Tentando novamente...`);
+        console.log(``);
+        return scrapData(symbol); // retry
+    }
+    finally{
+        browser.close();
+    }
 }
 
 function buildURL(symbol){

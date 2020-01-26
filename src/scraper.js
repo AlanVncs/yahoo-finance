@@ -8,11 +8,11 @@ module.exports = async function scrapData(symbol){
 
     if(!symbol) return null;
 
-    var browser = await puppeteer.launch({headless: false});
+    var browser = await puppeteer.launch({headless: true});
 
     symbol = (symbol==="^BVSP")?symbol:`${symbol}.SA`;
     const url = buildURL(symbol);
-    const page = await browser.newPage();
+    const page = (await browser.pages())[0];
 
     await page.goto(url);
     await page.waitForSelector(`#quote-header-info > div + div + div > div > div > span`);

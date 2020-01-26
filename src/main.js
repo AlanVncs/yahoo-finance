@@ -1,29 +1,31 @@
 const fs = require('fs');
 const scraper = require("./scraper");
 
-const symbols = ['^BVSP', 'ALPA4'];
-//, 'AMAR3', 'ARZZ3', 'BBAS3', 'BBDC3', 'BBDC4', 'BOVA11', 'CAML3', 'CMIG4', 'COGN3', 'CPFE3', 'CPLE6', 'CSMG3', 'CSNA3', 'CYRE3', 'DTEX3', 'EGIE3', 'ENBR3', 'ENEV3', 'ENGI11', 'EQTL3', 'FESA4', 'FLRY3', 'GGBR4', 'GOAU3', 'GOLL4', 'GRND3', 'GUAR3', 'ITSA4', 'ITUB3', 'ITUB4', 'JHSF3', 'LREN3', 'MDIA3', 'MRVE3', 'MULT3', 'ODPV3', 'OFSA3', 'PARD3', 'QUAL3', 'RADL3', 'RENT3', 'SANB11', 'SAPR4', 'SBSP3', 'SEER3', 'SMTO3', 'TEND3', 'TRIS3', 'TRPL4', 'USIM3', 'VIVT4', 'VULC3', 'WEGE3', 'YDUQ3'];
+const symbols = ['^BVSP', 'ALPA4', 'AMAR3', 'ARZZ3', 'BBAS3'];
+//, 'BBDC3', 'BBDC4', 'BOVA11', 'CAML3', 'CMIG4', 'COGN3', 'CPFE3', 'CPLE6', 'CSMG3', 'CSNA3', 'CYRE3', 'DTEX3', 'EGIE3', 'ENBR3', 'ENEV3', 'ENGI11', 'EQTL3', 'FESA4', 'FLRY3', 'GGBR4', 'GOAU3', 'GOLL4', 'GRND3', 'GUAR3', 'ITSA4', 'ITUB3', 'ITUB4', 'JHSF3', 'LREN3', 'MDIA3', 'MRVE3', 'MULT3', 'ODPV3', 'OFSA3', 'PARD3', 'QUAL3', 'RADL3', 'RENT3', 'SANB11', 'SAPR4', 'SBSP3', 'SEER3', 'SMTO3', 'TEND3', 'TRIS3', 'TRPL4', 'USIM3', 'VIVT4', 'VULC3', 'WEGE3', 'YDUQ3'];
 
 var table = [];
-var threads = 2;
+
+var threads = 3;
+var started = 0;
 var finished = 0;
-var active = 0;
 
 update();
 
 async function update(){
+    started = 0;
     finished = 0;
-    for(active=0; active<threads; active++){
-        const symbol = symbols[active];
-        console.log(`Started ${active + 1} -> ${symbol}`);
-        scraper(symbol).then(getScraperCallback(symbol));
-    }
+    symbols.forEach(scrapData);
 }
 
-// 43
+async function scrapData(symbol){
 
-function getScraperCallback(symbol){
-    return (histPrice) => {
+    // Avoid run more than ${thread} threads at the same time and ignore last null call
+    if(started-finished >= threads || !symbol) return;
+
+    started++;
+    console.log(`Started: ${started}/${symbols.length}`);
+    scraper(symbol).then((histPrice) => {
         histPrice.forEach(element => {
             const date = element["date"];
             if(!table[date]){
@@ -34,23 +36,16 @@ function getScraperCallback(symbol){
         });
         
         finished++;
+        console.log(`Finished: ${finished}/${symbols.length}`);
 
-        console.log(`Progress: ${finished} of ${symbols.length}`);
+        scrapData(symbols[started]);
         
-        // last call back
-        if(finished >= symbols.length){
+        if(finished == symbols.length){ // last symbol
             sortTable();
             writeCSV();
             return;
         }
-
-        symbol = symbols[active];
-        if(symbol){
-            console.log(`Started ${active + 1} -> ${symbol}`);
-            active++;
-            scraper(symbol).then(getScraperCallback(symbol));
-        }
-    };
+    });
 }
 
 function sortTable(){
@@ -87,4 +82,8 @@ function writeCSV(){
     }
 
     adjStream.close();
+}
+
+function moveFiles(){
+    
 }

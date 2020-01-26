@@ -22,6 +22,7 @@
   "homepage": "https://github.com/AlanVncs/yahoo-finance-api#readme",
   "dependencies": {
     "csv-parser": "^2.3.2",
+    "fs": "0.0.1-security",
     "puppeteer": "^2.0.0",
     "string-to-stream": "^3.0.1"
   }

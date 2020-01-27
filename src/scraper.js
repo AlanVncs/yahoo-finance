@@ -8,26 +8,40 @@ module.exports = async function scrapData(symbol){
 
     if(!symbol) return null;
 
-    var browser = await puppeteer.launch({headless: true});
+    const launchOptions = {
+        headless: true, 
+        // args: ['--proxy-server=ip:port']
+    };
 
+    var browser = await puppeteer.launch(launchOptions);
     symbol = (symbol==="^BVSP")?symbol:`${symbol}.SA`;
     const url = buildURL(symbol);
     const page = (await browser.pages())[0];
 
-    await page.goto(url);
-    await page.waitForSelector(`#quote-header-info > div + div + div > div > div > span`);
-    await page.waitForSelector(`a[download='${symbol}.csv`);
+    try {
+        await page.goto(url, {timeout: 60000});
+        await page.waitForSelector(`#quote-header-info > div + div + div > div > div > span`);
+        await page.waitForSelector(`a[download='${symbol}.csv`);
 
-    const {csvHistPrice, currentPrice} =  await page.evaluate(async (symbol) => {
-        var currentPrice = document.querySelector("#quote-header-info > div + div + div > div > div > span").innerText; // Price now
-        var fileLink = document.querySelector(`a[download='${symbol}.csv']`).href; // CSV file link
-        const csvHistPrice = await (await fetch(fileLink, {credentials: 'include'})).text(); // Download CSV file as string (Not necessarily includes today's price)
-        return {csvHistPrice, currentPrice};
-    }, symbol);
-    
-    browser.close();
+        const {csvHistPrice, currentPrice} =  await page.evaluate(async (symbol) => {
+            var currentPrice = document.querySelector("#quote-header-info > div + div + div > div > div > span").innerText; // Price now
+            var fileLink = document.querySelector(`a[download='${symbol}.csv']`).href; // CSV file link
+            const csvHistPrice = await (await fetch(fileLink, {credentials: 'include'})).text(); // Download CSV file as string (Not necessarily includes today's price)
+            return {csvHistPrice, currentPrice};
+        }, symbol);
 
-    return buildFromCSV(csvHistPrice, currentPrice);
+        return buildFromCSV(csvHistPrice, currentPrice);
+    }
+    catch(error){
+        console.log(`Download error: ${symbol}`);
+        console.log(`Message: ${error.message}`);
+        console.log(`Trying again...`)
+        console.log(``);
+        return scrapData(symbol);
+    }
+    finally {
+        browser.close();
+    }
 }
 
 async function buildFromCSV(csvHistPrice, currentPrice){

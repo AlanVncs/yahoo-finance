@@ -5,7 +5,7 @@ const symbols = ['^BVSP', 'ALPA4', 'AMAR3', 'ARZZ3', 'BBAS3', 'BBDC3', 'BBDC4', 
 
 var table = [];
 
-var threads = 10; // Tested on a Ryzen 3 2200G with 8GB RAM
+const threads = 10; // Tested on a Ryzen 3 2200G with 8GB RAM
 var started = 0;
 var finished = 0;
 

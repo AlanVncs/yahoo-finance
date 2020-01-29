@@ -34,10 +34,10 @@ module.exports = async function scrapData(symbol){
         return buildFromCSV(csvHistPrice, currentPrice);
     }
     catch(error){
-        console.log(`Download error: ${symbol}`);
-        console.log(`Message: ${error.message}`);
-        console.log(`Trying again...`)
-        console.log(``);
+        logInfo(`Download error: ${symbol}`);
+        logInfo(`Message: ${error.message}`);
+        logInfo(`Trying again...`)
+        logInfo(``);
         return scrapData(symbol);
     }
     finally {
@@ -80,4 +80,9 @@ function today(){
     date = (date<10)?`0${date}`:date;
 
     return `${year}-${month}-${date}`;
+}
+
+function logInfo(info){
+    console.log(info);
+    fs.appendFileSync('./log/scraper.log', `${info}\n`);
 }

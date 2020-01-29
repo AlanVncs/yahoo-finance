@@ -64,7 +64,11 @@ function buildURL(symbol){
 }
 
 function today(){
+
+    const offset = -3; // Brazil
+
     const now = new Date();
+    now.setHours(now.getHours() + offset);
 
     var year = now.getUTCFullYear();
 

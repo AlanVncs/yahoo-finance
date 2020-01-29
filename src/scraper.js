@@ -1,3 +1,4 @@
+const fs = require('fs');
 const puppeteer = require('puppeteer');
 const strToStream = require('string-to-stream')
 const csv = require('csv-parser');

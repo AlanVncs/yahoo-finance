@@ -9,7 +9,8 @@ module.exports = async function scrapData(symbol){
     if(!symbol) return null;
 
     const launchOptions = {
-        headless: true, 
+        headless: true,
+        args: ['--no-sandbox']
         // args: ['--proxy-server=ip:port']
     };
 

@@ -25,6 +25,7 @@ app.get('/update', function(req, res){
             }
         });
     }
+    res.redirect('/status');
 });
 
 app.get('/status', function(req, res){

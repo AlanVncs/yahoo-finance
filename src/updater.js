@@ -5,7 +5,7 @@ const symbols = ['^BVSP', 'ALPA4', 'AMAR3', 'ARZZ3', 'BBAS3', 'BBDC3', 'BBDC4', 
 
 var table = [];
 
-const threads = 10; // Ideal for a home PC
+const threads = 10; // Ideal for a normal PC. Servers can do more.
 var started = 0;
 var finished = 0;
 

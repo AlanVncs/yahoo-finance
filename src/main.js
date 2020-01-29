@@ -78,8 +78,6 @@ async function writeCSV(){
         end: endStreams
     };
 
-    var v = streams['open'];
-
     // Write headers
     streams.write('Data');
     symbols.forEach(symbol => {

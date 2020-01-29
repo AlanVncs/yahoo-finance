@@ -138,7 +138,6 @@ function moveFiles(){
     const bkpDir = `${fileDir}/backups`;
     const tmpDir = './tmpFiles';
     const names = ['open', 'high', 'low', 'close', 'adj', 'volume'];
-    // const adj = 'adj.csv'
     
     names.forEach((name) => {
 

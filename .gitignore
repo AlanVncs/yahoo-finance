@@ -9,5 +9,8 @@ node_modules/
 test/
 tmpFiles/*
 files/*
-!.gitkeep
 lastUpdate
+logs/*
+
+
+!.gitkeep

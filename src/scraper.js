@@ -85,5 +85,5 @@ function today(){
 
 function logInfo(info){
     console.log(info);
-    fs.appendFileSync('./log/scraper.log', `${info}\n`);
+    fs.appendFileSync('./logs/scraper.log', `${info}\n`);
 }

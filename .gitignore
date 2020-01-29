@@ -3,12 +3,14 @@ node_modules/
 
 
 # Project
-files/
-logs/
-test/
-tmpFiles/
+files/*
+!files/backups
+files/backups/*
+logs/*
+test/*
+tmpFiles/*
 lastUpdate
 .env
 
 
-# .gitkeep
+!.gitkeep

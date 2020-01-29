@@ -5,7 +5,7 @@ const symbols = ['^BVSP', 'ALPA4', 'AMAR3', 'ARZZ3', 'BBAS3', 'BBDC3', 'BBDC4', 
 
 var table = [];
 
-const threads = 10; // Tested on a Ryzen 3 2200G with 8GB RAM
+const threads = 10; // Ideal for a home PC
 var started = 0;
 var finished = 0;
 
@@ -19,7 +19,7 @@ async function update(){
 
 async function scrapData(symbol){
 
-    // Avoid run more than ${thread} threads at the same time and ignore last null call
+    // Avoid run more than ${thread} cromium instances at the same time and ignore last null call
     if(started-finished >= threads || !symbol) return;
 
     started++;
@@ -42,9 +42,11 @@ async function scrapData(symbol){
         finished++;
         console.log(`Finished: ${finished}/${symbols.length}`);
 
+        // When finished, start another one
         scrapData(symbols[started]);
         
-        if(finished == symbols.length){ // last symbol
+        // Last one
+        if(finished == symbols.length){
             sortTable();
             await writeCSV();
             moveFiles();

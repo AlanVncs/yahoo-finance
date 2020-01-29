@@ -15,8 +15,11 @@ module.exports = async function scrapData(symbol){
         // args: ['--proxy-server=ip:port']
     };
 
-    var browser = await puppeteer.launch(launchOptions);
+    const symbolBefore = symbol;
     symbol = (symbol==="^BVSP")?symbol:`${symbol}.SA`;
+
+
+    var browser = await puppeteer.launch(launchOptions);
     const url = buildURL(symbol);
     const page = (await browser.pages())[0];
 
@@ -39,7 +42,7 @@ module.exports = async function scrapData(symbol){
         console.log(`Message: ${error.message}`);
         console.log(`Trying again...`);
         console.log(``);
-        return scrapData(symbol);
+        return scrapData(symbolBefore);
     }
     finally {
         browser.close();

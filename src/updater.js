@@ -9,15 +9,15 @@ const threads = 10; // Ideal for a normal PC. Servers can do more.
 var started = 0;
 var finished = 0;
 
-update();
-
-async function update(){
+module.exports = async function update(callback){
     started = 0;
     finished = 0;
-    symbols.forEach(scrapData);
+    symbols.forEach((symbol) => {
+        scrapData(symbol, callback);
+    });
 }
 
-async function scrapData(symbol){
+async function scrapData(symbol, callback){
 
     // Avoid run more than ${thread} cromium instances at the same time and ignore last null call
     if(started-finished >= threads || !symbol) return;
@@ -38,18 +38,22 @@ async function scrapData(symbol){
             table[date][symbol]["adj"] = (element['adj'] == 'null')?'FALSO':element['adj'];
             table[date][symbol]["volume"] = (element['volume'] == 'null')?'FALSO':element['volume'];
         });
+
+        callback(finished/symbols.length);
         
         finished++;
         console.log(`Finished: ${finished}/${symbols.length}`);
 
         // When finished, start another one
-        scrapData(symbols[started]);
+        scrapData(symbols[started], callback);
         
         // Last one
         if(finished == symbols.length){
             sortTable();
             await writeCSV();
             moveFiles();
+            callback(1);
+            console.log("Update finished!");
         }
     });
 }

@@ -3,10 +3,10 @@ node_modules/
 
 
 # Project
-/test/
-logs/
-tmpFiles/
 files/
+logs/
+test/
+tmpFiles/
 lastUpdate
 .env
 

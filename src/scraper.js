@@ -19,7 +19,7 @@ module.exports = async function scrapData(symbol){
     const page = (await browser.pages())[0];
 
     try {
-        await page.goto(url, {timeout: 60000});
+        await page.goto(url);
         await page.waitForSelector(`#quote-header-info > div + div + div > div > div > span`);
         await page.waitForSelector(`a[download='${symbol}.csv`);
 

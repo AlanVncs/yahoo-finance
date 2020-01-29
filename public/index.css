@@ -1,0 +1,48 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+
+body {
+    text-align: center;
+    padding-top: 300px;
+}
+
+div.content {
+    display: inline-block;
+    width: 600px;
+    text-align: center;
+}
+
+div.btn-update {
+    display: inline-block;
+    border: 2px solid green;
+    border-radius: 3px;;
+    text-align: center;
+    height: 50px;
+    width: 200px;
+    line-height: 48px;
+    font-size: larger;
+    cursor: pointer;
+}
+
+div.btn-update:hover {
+    background-color: green;
+    color: white;
+}
+
+div.status {
+    margin-top: 100px;
+}
+
+div.date {
+    display: inline-block;
+}
+
+.btn-disabled {
+    background-color: green;
+    color: white;
+    cursor: not-allowed !important;
+}

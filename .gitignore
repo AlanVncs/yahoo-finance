@@ -1,16 +1,14 @@
 # Dependency directories
 node_modules/
 
-# dotenv environment variables file
-.env
-
 
 # Project
 test/
-tmpFiles/*
-files/*
+logs/
+tmpFiles/
+files/
 lastUpdate
-logs/*
+.env
 
 
-!.gitkeep
+!*.gitkeep

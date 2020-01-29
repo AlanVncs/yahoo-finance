@@ -50,7 +50,6 @@ async function scrapData(symbol){
             sortTable();
             await writeCSV();
             moveFiles();
-            return;
         }
     });
 }
@@ -137,13 +136,15 @@ function moveFiles(){
     const names = ['open', 'high', 'low', 'close', 'adj', 'volume'];
     // const adj = 'adj.csv'
     
-    // Backup previous file
     names.forEach((name) => {
+
+        // Backups previous files
         if(fs.existsSync(`${fileDir}/${name}.csv`)){
             fs.copyFileSync(`${fileDir}/${name}.csv`, `${bkpDir}/${name}.csv`);
         }
     
         try{
+            // Copy temp files to downlaod directory
             fs.copyFileSync(`${tmpDir}/${name}.csv`, `${fileDir}/${name}.csv`);
         }
         catch(error){

@@ -3,7 +3,7 @@ node_modules/
 
 
 # Project
-test/
+/test/
 logs/
 tmpFiles/
 files/
@@ -11,4 +11,4 @@ lastUpdate
 .env
 
 
-!*.gitkeep
+# .gitkeep

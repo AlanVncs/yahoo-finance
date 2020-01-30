@@ -5,47 +5,56 @@ const csv = require('csv-parser');
 
 const PERIOD = 315619200; // 10 years in seconds
 
-module.exports = async function scrapData(symbol){
+const launchOptions = {
+    headless: true,
+    args: ['--no-sandbox']
+    // args: ['--proxy-server=ip:port']
+};
 
-    if(!symbol) return null;
+module.exports = {
+    browser: null,
+    startBrowser: async function(symbol){
+        this.browser = await puppeteer.launch(launchOptions);
+        return this.browser;
+    },
+    scrapData: async function(symbol){
+        if(!symbol) return;
+        if(!this.browser) throw 'Error: Browser not open';
+        
 
-    const launchOptions = {
-        headless: true,
-        args: ['--no-sandbox']
-        // args: ['--proxy-server=ip:port']
-    };
+        const symbolBefore = symbol;
+        symbol = (symbol==="^BVSP")?symbol:`${symbol}.SA`;
 
-    const symbolBefore = symbol;
-    symbol = (symbol==="^BVSP")?symbol:`${symbol}.SA`;
+        const url = buildURL(symbol);
+        const page = await this.browser.newPage();
 
-
-    var browser = await puppeteer.launch(launchOptions);
-    const url = buildURL(symbol);
-    const page = (await browser.pages())[0];
-
-    try {
-        await page.goto(url);
-        await page.waitForSelector(`#quote-header-info > div + div + div > div > div > span`);
-        await page.waitForSelector(`a[download='${symbol}.csv`);
-
-        const {csvHistPrice, currentPrice} =  await page.evaluate(async (symbol) => {
-            var currentPrice = document.querySelector("#quote-header-info > div + div + div > div > div > span").innerText; // Price now
-            var fileLink = document.querySelector(`a[download='${symbol}.csv']`).href; // CSV file link
-            const csvHistPrice = await (await fetch(fileLink, {credentials: 'include'})).text(); // Download CSV file as string (Not necessarily includes today's price)
-            return {csvHistPrice, currentPrice};
-        }, symbol);
-
-        return buildFromCSV(csvHistPrice, currentPrice);
-    }
-    catch(error){
-        console.log(`Download error: ${symbol}`);
-        console.log(`Message: ${error.message}`);
-        console.log(`Trying again...`);
-        console.log(``);
-        return scrapData(symbolBefore);
-    }
-    finally {
-        browser.close();
+        try {
+            await page.goto(url);
+            const promise1 = page.waitForSelector(`#quote-header-info > div + div + div > div > div > span`);
+            const promise2 = page.waitForSelector(`a[download='${symbol}.csv`);
+            await Promise.all([promise1, promise2]);
+    
+            const {csvHistPrice, currentPrice} =  await page.evaluate(async (symbol) => {
+                var currentPrice = document.querySelector("#quote-header-info > div + div + div > div > div > span").innerText; // Price now
+                var fileLink = document.querySelector(`a[download='${symbol}.csv']`).href; // CSV file link
+                const csvHistPrice = await (await fetch(fileLink, {credentials: 'include'})).text(); // Download CSV file as string (Not necessarily includes today's price)
+                return {csvHistPrice, currentPrice};
+            }, symbol);
+    
+            return buildFromCSV(csvHistPrice, currentPrice);
+        }
+        catch(error){
+            console.log(`Download error: ${symbol}`);
+            console.log(`Message: ${error.message}`);
+            console.log(`Trying again...`);
+            console.log(``);
+            return this.scrapData(symbolBefore);
+        }
+        finally {
+            page.close().catch(() => {
+                console.log(`N fechou ${symbolBefore}`);
+            });
+        }
     }
 }
 

@@ -5,11 +5,13 @@ const symbols = ['^BVSP', 'ALPA4', 'AMAR3', 'ARZZ3', 'BBAS3', 'BBDC3', 'BBDC4', 
 
 var table = [];
 
-const threads = 10; // Ideal for a normal PC. Servers can do more.
+const threads = 10;
 var started = 0;
 var finished = 0;
 
 module.exports = async function update(callback){
+    console.log(new Date());
+    await scraper.startBrowser();
     started = 0;
     finished = 0;
     symbols.forEach((symbol) => {
@@ -24,7 +26,7 @@ async function scrapData(symbol, callback){
 
     started++;
     console.log(`Started: ${started}/${symbols.length}`);
-    scraper(symbol).then(async (histPrice) => {
+    scraper.scrapData(symbol).then(async (histPrice) => {
         histPrice.forEach(element => {
             const date = element["date"];
             if(!table[date]){
@@ -54,6 +56,7 @@ async function scrapData(symbol, callback){
             moveFiles();
             callback(1);
             console.log("Update finished!");
+            console.log(new Date());
         }
     });
 }

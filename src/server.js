@@ -6,8 +6,16 @@ const app = express();
 const PORT = '80';
 
 app.use(express.static('public'));
-app.use(express.static('files'));
-app.use('/backup', express.static('files/backups'));
+
+app.use(/\/file\/(\w+\.csv)/, function(req, res, next){
+    res.header("Content-Type", "text/plain");
+    fs.createReadStream(`files/${req.params[0]}`).pipe(res);
+});
+
+app.use(/\/backup\/(\w+\.csv)/, function(req, res, next){
+    res.header("Content-Type", "text/plain");
+    fs.createReadStream(`files/backups/${req.params[0]}`).pipe(res);
+});
 
 var updating = false;
 var taxa = 0;

@@ -64,9 +64,7 @@ async function scrapData(symbol, callback){
 
 function sortTable(){
     newTable = {};
-    Object.keys(table)
-    .sort((date1, date2) => (date1<date2)?1:-1) // Reverse ordering
-    .forEach(key => newTable[key] = table[key]);
+    Object.keys(table).sort().forEach(key => newTable[key] = table[key]);
     table = newTable;
 }
 

@@ -51,6 +51,7 @@ async function scrapData(symbol, callback){
         
         // Last one
         if(finished == symbols.length){
+            scraper.stopBrowser();
             sortTable();
             await writeCSV();
             moveFiles();

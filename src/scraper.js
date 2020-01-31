@@ -7,15 +7,20 @@ const PERIOD = 315619200; // 10 years in seconds
 
 const launchOptions = {
     headless: true,
-    args: ['--no-sandbox']
-    // args: ['--proxy-server=ip:port']
+    args: [
+        '--no-sandbox'
+        // '--proxy-server=ip:port'
+    ]
 };
 
 module.exports = {
     browser: null,
-    startBrowser: async function(symbol){
+    startBrowser: async function(){
         this.browser = await puppeteer.launch(launchOptions);
         return this.browser;
+    },
+    stopBrowser: async function(){
+        return this.browser.close();
     },
     scrapData: async function(symbol){
         if(!symbol) return;
@@ -26,10 +31,12 @@ module.exports = {
         symbol = (symbol==="^BVSP")?symbol:`${symbol}.SA`;
 
         const url = buildURL(symbol);
-        const page = await this.browser.newPage();
+        const context = await this.browser.createIncognitoBrowserContext();
+        const page = await context.newPage();
 
         try {
             await page.goto(url);
+            // page.on('console', msg => console.log(`${msg.args[0]}`));
             const promise1 = page.waitForSelector(`#quote-header-info > div + div + div > div > div > span`);
             const promise2 = page.waitForSelector(`a[download='${symbol}.csv`);
             await Promise.all([promise1, promise2]);
@@ -45,14 +52,19 @@ module.exports = {
         }
         catch(error){
             console.log(`Download error: ${symbol}`);
-            console.log(`Message: ${error.message}`);
+            console.log(error)
             console.log(`Trying again...`);
             console.log(``);
             return this.scrapData(symbolBefore);
         }
         finally {
             page.close().catch(() => {
-                console.log(`N fechou ${symbolBefore}`);
+                // Browser may be closed before
+                // Don't care
+            });
+            context.close().catch(() => {
+                // Browser may be closed before
+                // Don't care
             });
         }
     }

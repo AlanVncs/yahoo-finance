@@ -9,12 +9,24 @@ app.use(express.static('public'));
 
 app.use(/\/file\/(\w+\.csv)/, function(req, res, next){
     res.header("Content-Type", "text/plain");
-    fs.createReadStream(`files/${req.params[0]}`).pipe(res);
+    const file = `files/${req.params[0]}`;
+    if(fs.existsSync(file)){
+        fs.createReadStream(file).pipe(res);
+    }
+    else{
+        res.send(`Arquivo ${file} não encontrado`);
+    }
 });
 
 app.use(/\/backup\/(\w+\.csv)/, function(req, res, next){
     res.header("Content-Type", "text/plain");
-    fs.createReadStream(`files/backups/${req.params[0]}`).pipe(res);
+    const file = `files/backups/${req.params[0]}`;
+    if(fs.existsSync(file)){
+        fs.createReadStream(file).pipe(res);
+    }
+    else{
+        res.send(`Arquivo ${file} não encontrado`);
+    }
 });
 
 var updating = false;

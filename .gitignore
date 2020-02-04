@@ -1,16 +1,11 @@
-# Dependency directories
 node_modules/
+test/
 
-
-# Project
 files/*
 !files/backups
 files/backups/*
 logs/*
-test/*
 tmpFiles/*
 lastUpdate
-.env
-
 
 !.gitkeep

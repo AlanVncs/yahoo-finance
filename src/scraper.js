@@ -3,15 +3,15 @@ const strToStream = require('string-to-stream');
 const csv = require('csv-parser');
 const logToFile = require('log-to-file');
 
-const PERIOD_OFFSET = 10; // years
+const PERIOD_OFFSET = process.env.PERIOD_OFFSET || 10; // years
 const SYMBOL_SUFFIX = 'SA'
 
 const clusterOptions = {
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 10,
+    maxConcurrency: process.env.MAX_CONCURRENCY || 10,
     monitor: true,
     puppeteerOptions: {
-        headless: true,
+        headless: process.env.HEADLESS || true,
         args: [
             '--no-sandbox',
             // '--proxy-server=ip:port'

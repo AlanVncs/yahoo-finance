@@ -7,5 +7,6 @@ files/backups/*
 logs/*
 tmpFiles/*
 lastUpdate
+*.env
 
 !.gitkeep

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "node test/test.js",
-    "start": "node src/server.js"
+    "start": "node -r dotenv/config src/server.js dotenv_config_path=src/.env"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/AlanVncs/yahoo-finance-api#readme",
   "dependencies": {
     "csv-parser": "^2.3.2",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "log-to-file": "^2.0.2",

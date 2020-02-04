@@ -3,7 +3,7 @@ const strToStream = require('string-to-stream');
 const csv = require('csv-parser');
 const logToFile = require('log-to-file');
 
-const PERIOD_OFFSET = 315619200; // 10 years in seconds
+const PERIOD_OFFSET = 10; // years
 const SYMBOL_SUFFIX = 'SA'
 
 const clusterOptions = {
@@ -79,8 +79,17 @@ async function execAlways(cluster, symbol, max=5){
 }
 
 function buildURL(symbol){
-    const end = Math.floor(Date.now()/1000) - 30; // -30 seconds to be sure it isn't future ;D
-    const start = end - PERIOD_OFFSET;
+
+    const date = new Date(); // Now
+
+    const end = Math.floor(date.getTime()/1000) - 30;  // -30 seconds to be sure it isn't future ;D
+
+    date.setUTCFullYear(date.getUTCFullYear() - PERIOD_OFFSET); // ${PERIOD_OFFSET} years ago
+    date.setUTCMonth(0); // jan
+    date.setUTCDate(1); // 01 jan
+
+    const start = Math.floor(date.getTime()/1000);
+
     return encodeURI(`https://finance.yahoo.com/quote/${parseSymbol(symbol)}/history?period1=${start}&period2=${end}&interval=1d&filter=history&frequency=1d`);
 }
 

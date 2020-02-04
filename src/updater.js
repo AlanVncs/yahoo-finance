@@ -3,31 +3,11 @@ const scraper = require("./scraper");
 
 const symbols = ['^BVSP', 'ALPA4', 'AMAR3', 'ARZZ3', 'BBAS3', 'BBDC3', 'BBDC4', 'BOVA11', 'CAML3', 'CMIG4', 'COGN3', 'CPFE3', 'CPLE6', 'CSMG3', 'CSNA3', 'CYRE3', 'DTEX3', 'EGIE3', 'ENBR3', 'ENEV3', 'ENGI11', 'EQTL3', 'FESA4', 'FLRY3', 'GGBR4', 'GOAU3', 'GOLL4', 'GRND3', 'GUAR3', 'ITSA4', 'ITUB3', 'ITUB4', 'JHSF3', 'LREN3', 'MDIA3', 'MRVE3', 'MULT3', 'ODPV3', 'OFSA3', 'PARD3', 'QUAL3', 'RADL3', 'RENT3', 'SANB11', 'SAPR4', 'SBSP3', 'SEER3', 'SMTO3', 'TEND3', 'TRIS3', 'TRPL4', 'USIM3', 'VIVT4', 'VULC3', 'WEGE3', 'YDUQ3'];
 
-var table = [];
-
-const threads = 10;
-var started = 0;
-var finished = 0;
-
 module.exports = async function update(callback){
-    console.log(new Date());
-    await scraper.startBrowser();
-    started = 0;
-    finished = 0;
-    symbols.forEach((symbol) => {
-        scrapData(symbol, callback);
-    });
-}
-
-async function scrapData(symbol, callback){
-
-    // Avoid run more than ${thread} cromium instances at the same time and ignore last null call
-    if(started-finished >= threads || !symbol) return;
-
-    started++;
-    console.log(`Started: ${started}/${symbols.length}`);
-    scraper.scrapData(symbol).then(async (histPrice) => {
-        histPrice.forEach(element => {
+    const table = [];
+    const priceHistoryArray = await scraper.historicalData(symbols, callback);
+    priceHistoryArray.forEach(({symbol, priceHistory}) => {
+        priceHistory.forEach(element => {
             const date = element["date"];
             if(!table[date]){
                 table[date] = [];
@@ -40,35 +20,18 @@ async function scrapData(symbol, callback){
             table[date][symbol]["adj"] = (element['adj'] == 'null')?'FALSO':element['adj'];
             table[date][symbol]["volume"] = (element['volume'] == 'null')?'FALSO':element['volume'];
         });
-
-        callback(finished/symbols.length);
-        
-        finished++;
-        console.log(`Finished: ${finished}/${symbols.length}`);
-
-        // When finished, start another one
-        scrapData(symbols[started], callback);
-        
-        // Last one
-        if(finished == symbols.length){
-            scraper.stopBrowser();
-            sortTable();
-            await writeCSV();
-            moveFiles();
-            callback(1);
-            console.log("Update finished!");
-            console.log(new Date());
-        }
     });
+    await writeCSV(sortTable(table));
+    moveFiles();
 }
 
-function sortTable(){
-    newTable = {};
+function sortTable(table){
+    const newTable = {};
     Object.keys(table).sort().forEach(key => newTable[key] = table[key]);
-    table = newTable;
+    return newTable;
 }
 
-async function writeCSV(){
+async function writeCSV(table){
 
     const tmpFilesDir = './tmpFiles';
 

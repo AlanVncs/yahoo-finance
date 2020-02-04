@@ -24,7 +24,9 @@
     "csv-parser": "^2.3.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "log-to-file": "^2.0.2",
     "puppeteer": "^2.0.0",
+    "puppeteer-cluster": "^0.18.0",
     "string-to-stream": "^3.0.1"
   }
 }

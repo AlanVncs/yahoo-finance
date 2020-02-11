@@ -10,6 +10,7 @@ app.use(express.static('public'));
 app.use(/\/file\/(\w+\.csv)/, function(req, res, next){
     res.header("Content-Type", "text/plain");
     const file = `files/${req.params[0]}`;
+    console.log(`Arquivo ${file} solicitado`);
     if(fs.existsSync(file)){
         fs.createReadStream(file).pipe(res);
     }

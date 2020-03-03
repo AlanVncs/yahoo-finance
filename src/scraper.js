@@ -55,7 +55,7 @@ module.exports = {
 };
 
 async function execAlways(cluster, symbol, max=5){
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         if(max == 0){
             log(`Número máximo de execuções alcançado`);
             log(`Abortando a operação de ID: ${symbol}`);
@@ -67,12 +67,12 @@ async function execAlways(cluster, symbol, max=5){
             .then(priceHistory => {
                 resolve({symbol, priceHistory});
             })
-            .catch((reason)=>{
+            .catch(async (reason) => {
                 log(`ID: ${symbol}`);
                 log(reason);
                 log(`Tentativas restantes: ${--max}`);
                 log(`--------`);
-                return execAlways(cluster, symbol, max);
+                resolve(execAlways(cluster, symbol, max));
             });
         }
     });
